@@ -8,11 +8,13 @@ body {
   font-family: "VT323", monospace;
   font-weight: 400;
   font-style: normal;
+
+  background-color: #000;
 }
 
-body,
 .bloodWorm {
-  background-color: #000;
+  background-color: #8b0000;
+  border: 1px dotted #000;
 }
 
 #bloodworm-logo {
@@ -82,10 +84,6 @@ body,
 .game_border-3,
 #logo {
   background-color: #c4cfa3;
-}
-
-.bloodWorm {
-  border: 1px dotted #000;
 }
 
 .prey {
