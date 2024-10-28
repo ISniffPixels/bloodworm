@@ -6,7 +6,7 @@ const board = document.querySelector(".game_board");
 // DEFINING GAME VARIABLES
 let bloodWorm = [{ x: 10, y: 10 }];
 
-// DRAWS GAME MAP, BLOODWORK, AND PREY
+// DRAWS GAME MAP, BLOODWORM, AND PREY
 function draw() {
   board.innerHTML = "";
   drawBloodWorm();
