@@ -12,7 +12,7 @@ body {
 
 body,
 .bloodWorm {
-  background-color: #8b0000;
+  background-color: #000;
 }
 
 #bloodworm-logo {
@@ -40,19 +40,19 @@ body,
 }
 
 .game_border-1 {
-  border: 10px solid #000;
-  border-radius: 30px;
-  box-shadow: inset 0 0 0 10px #8b0000;
+  border: 10px groove #8b0000;
+  border-radius: 40px;
+  box-shadow: inset 0 0 0 10px #000;
 }
 
 .game_border-2 {
-  border: 8px solid #000;
+  border: 8px inset #8b0000;
   border-radius: 26px;
   box-shadow: inset 0 0 0 10px #8b0000;
 }
 
 .game_border-3 {
-  border: 30px solid #000;
+  border: 30px dashed #000;
   border-radius: 20px;
   box-shadow: inset 0 0 0 5px #8b0000;
 }

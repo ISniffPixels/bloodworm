@@ -1,1 +1,3 @@
-console.log("test");
+"use strict";
+
+// DEFINING HTML ELEMENTS BY STORING THEM IN VARIABLES
