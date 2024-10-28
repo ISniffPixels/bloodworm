@@ -14,10 +14,11 @@ body {
 
 .bloodWorm {
   background-color: #8b0000;
-  border: 1px dotted #000;
+  border: 2px dotted #000;
+  border-radius: 100px;
 }
 
-#bloodworm-logo {
+.bloodworm-logo {
   position: absolute;
 }
 
@@ -88,5 +89,6 @@ body {
 
 .prey {
   background-color: #deb887;
-  border: 5px solid #000;
+  border: 2px solid #000;
+  border-radius: 100px;
 }
