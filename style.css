@@ -12,10 +12,10 @@ body {
 
 body,
 .bloodWorm {
-  background-color: #414141;
+  background-color: #8b0000;
 }
 
-#game_board {
+.game_board {
   display: grid;
   grid-template-columns: repeat(20, 20px);
   grid-template-rows: repeat(20, 20px);
@@ -30,13 +30,59 @@ body,
 }
 
 .game_border-2 {
-  border: 10px solid #000;
-  border-radius: 30px;
+  border: 8px solid #000;
+  border-radius: 26px;
   box-shadow: inset 0 0 0 10px #8b0000;
 }
 
 .game_border-3 {
-  border: 10px solid #000;
-  border-radius: 30px;
-  box-shadow: inset 0 0 0 10px #8b0000;
+  border: 30px solid #000;
+  border-radius: 20px;
+  box-shadow: inset 0 0 0 5px #8b0000;
+}
+
+#instruction_text {
+  position: absolute;
+  top: 60%;
+  color: #000;
+  width: 300px;
+  text-align: center;
+  text-transform: capitalize;
+  padding: 30px;
+  margin: 0;
+}
+
+#scores {
+  display: flex;
+  justify-content: space-between;
+}
+
+#score {
+  color: #fff000;
+}
+
+#score,
+#highScore {
+  font-size: 40px;
+  font-weight: bolder;
+  text-shadow: 6px 6px 3px #000;
+  margin: 10px 0;
+}
+
+#highScore {
+  display: none;
+  color: #dc143c;
+}
+
+.game_border-3,
+#logo {
+  background-color: #c4cfa3;
+}
+
+.bloodWorm {
+  border: 1px dotted #000;
+}
+
+.prey {
+  background-color: #deb887;
 }
