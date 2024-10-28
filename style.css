@@ -9,7 +9,12 @@ body {
   font-weight: 400;
   font-style: normal;
 
-  background-color: #000;
+  background-color: #fff;
+}
+
+.prey {
+  background-color: #deb887;
+  border: 2px solid #000;
 }
 
 .bloodWorm {
@@ -35,10 +40,10 @@ body {
 }
 
 .game_board {
+  background: center / contain url("");
   display: grid;
   grid-template-columns: repeat(20, 20px);
   grid-template-rows: repeat(20, 20px);
-  border-radius: 100px;
   margin: 5px;
 }
 
@@ -62,7 +67,7 @@ body {
 
 #scores {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 #score {
@@ -71,9 +76,11 @@ body {
 
 #score,
 #highScore {
+  font-family: "Rubik Wet Paint", system-ui;
+  font-style: normal;
   font-size: 40px;
   font-weight: bolder;
-  text-shadow: 6px 6px 3px #000;
+  -webkit-text-stroke: 1px black;
   margin: 10px 0;
 }
 
@@ -85,10 +92,4 @@ body {
 .game_border-3,
 #logo {
   background-color: #c4cfa3;
-}
-
-.prey {
-  background-color: #deb887;
-  border: 2px solid #000;
-  border-radius: 100px;
 }

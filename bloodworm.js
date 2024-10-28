@@ -3,10 +3,12 @@
 // DEFINING HTML ELEMENTS BY STORING THEM IN VARIABLES
 const board = document.querySelector(".game_board");
 const instructions = document.querySelector("#instruction_text");
-const logo = document.querySelector(".bloodworm-logo");
+const BWlogo = document.querySelector(".bloodworm-logo");
 
 // DEFINING GAME VARIABLES
-const score = document.querySelector("#score");
+const scoreEle = document.querySelector("#score");
+const highScoreEle = document.querySelector("#highScore");
+let highScore = 0;
 let gridArea = 20;
 let bloodWorm = [{ x: 10, y: 10 }];
 let prey = generatePrey();
@@ -45,14 +47,13 @@ function setPos(element, position) {
   element.style.gridRow = position.y;
 }
 
-// TESTING DRAWBLOODWORM FUNCTION
-// draw();
-
 // DRAW PREY FUNCTION
 function drawPrey() {
-  const preyElem = createGameElem("div", "prey");
-  setPos(preyElem, prey);
-  board.appendChild(preyElem);
+  if (gameStart) {
+    const preyElem = createGameElem("div", "prey");
+    setPos(preyElem, prey);
+    board.appendChild(preyElem);
+  }
 }
 
 // GENERATES PREY AT RANDOM LOCATION THROUGHOUT GRID AREA
@@ -78,7 +79,6 @@ function move() {
   }
 
   bloodWorm.unshift(bloodWormHead);
-  // bloodWorm.pop();
 
   if (bloodWormHead.x === prey.x && bloodWormHead.y === prey.y) {
     prey = generatePrey();
@@ -99,7 +99,7 @@ function move() {
 function startGame() {
   gameStart = true;
   instructions.style.display = "none";
-  logo.style.display = "none";
+  BWlogo.style.display = "none";
   gameInterval = setInterval(() => {
     move();
     collisionDetect();
@@ -126,7 +126,6 @@ function initSession(e) {
 
 document.addEventListener("keydown", initSession);
 function increaseSpeed() {
-  console.log(gameSpeedDelay);
   // CONDITIONALS MANAGE THE SPEED OF BLOODWORM THE MORE IT EATS SO IT  DOESN'T GET OUT OF CONTROL AND BECOME HARD TO MOVE
   if (gameSpeedDelay > 150) {
     gameSpeedDelay -= 5;
@@ -152,7 +151,7 @@ function collisionDetect() {
     resetGame();
   }
 
-  for (let s = 1; s < bloodWormHead.length; s++) {
+  for (let s = 1; s < bloodWorm.length; s++) {
     if (
       bloodWormHead.x === bloodWorm[s].x &&
       bloodWormHead.y === bloodWorm[s].y
@@ -164,6 +163,8 @@ function collisionDetect() {
 
 // RESETS GAME FUNCTION CALL
 function resetGame() {
+  hightScoreUpdate();
+  stopGame();
   bloodWorm = [{ x: 10, y: 10 }];
   prey = generatePrey();
   direction = "right";
@@ -175,4 +176,23 @@ function resetGame() {
 function scoreUpate() {
   const currentScore = bloodWorm.length - 1;
   score.innerHTML = currentScore.toString().padStart(3, "0");
+}
+
+// STOPS GAME, SELF EXPLANATORY :D
+function stopGame() {
+  clearInterval(gameInterval);
+  gameStart = false;
+  instructions.style.display = "block";
+  BWlogo.style.display = "block";
+}
+
+// UPDATES HIGH SCORE
+function hightScoreUpdate() {
+  const currentScore = bloodWorm.length - 1;
+
+  if (currentScore > highScore) {
+    highScore = currentScore;
+    highScoreEle.innerHTML = highScore.toString().padStart(3, "0");
+  }
+  highScoreEle.style.display = "block";
 }
