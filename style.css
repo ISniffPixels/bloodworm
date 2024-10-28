@@ -15,6 +15,22 @@ body,
   background-color: #8b0000;
 }
 
+#bloodworm-logo {
+  position: absolute;
+}
+
+#instruction_text {
+  position: absolute;
+  top: 60%;
+  color: #000;
+  width: 300px;
+  text-align: center;
+  text-transform: capitalize;
+  font-size: 1.8rem;
+  padding: 30px;
+  margin: 0;
+}
+
 .game_board {
   display: grid;
   grid-template-columns: repeat(20, 20px);
@@ -39,17 +55,6 @@ body,
   border: 30px solid #000;
   border-radius: 20px;
   box-shadow: inset 0 0 0 5px #8b0000;
-}
-
-#instruction_text {
-  position: absolute;
-  top: 60%;
-  color: #000;
-  width: 300px;
-  text-align: center;
-  text-transform: capitalize;
-  padding: 30px;
-  margin: 0;
 }
 
 #scores {
@@ -85,4 +90,5 @@ body,
 
 .prey {
   background-color: #deb887;
+  border: 5px solid #000;
 }
