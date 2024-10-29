@@ -100,6 +100,9 @@ function startGame() {
   gameStart = true;
   instructions.style.display = "none";
   BWlogo.style.display = "none";
+  board.style.backgroundImage = "url('BWBG.png')";
+  board.style.backgroundPosition = "center";
+  board.style.backgroundSize = "contain";
   gameInterval = setInterval(() => {
     move();
     collisionDetect();
@@ -149,6 +152,9 @@ function collisionDetect() {
     bloodWormHead.y > gridArea
   ) {
     resetGame();
+    board.style.backgroundImage = "none";
+    board.style.backgroundPosition = "none";
+    board.style.backgroundSize = "none";
   }
 
   for (let s = 1; s < bloodWorm.length; s++) {
@@ -157,6 +163,9 @@ function collisionDetect() {
       bloodWormHead.y === bloodWorm[s].y
     ) {
       resetGame();
+      board.style.backgroundImage = "none";
+      board.style.backgroundPosition = "none";
+      board.style.backgroundSize = "none";
     }
   }
 }
