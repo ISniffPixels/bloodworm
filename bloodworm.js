@@ -1,207 +1,265 @@
 "use strict";
 
-// DEFINING HTML ELEMENTS BY STORING THEM IN VARIABLES
-const board = document.querySelector(".game_board");
-const instructions = document.querySelector("#instruction_text");
-const BWlogo = document.querySelector(".bloodworm-logo");
+// I USED OOP STRUCTURE FOR THE GAME, BECAUSE ITS A BIT CLEANER THAN THE STANDARD FUNCTION OR CONSTRUCTOR FUNCTION-PROTOYPE APPROACH
+class BloodWormGame {
+  constructor() {
+    // DEFINING HTML ELEMENTS (LOGO & INSTRUCTIONS) ON GAME SCREEN
+    this.screen = document.querySelector(".game_screen");
+    this.instructions = document.querySelector("#instruction_text");
+    this.BWlogo = document.querySelector(".bloodworm-logo");
 
-// DEFINING GAME VARIABLES
-const scoreEle = document.querySelector("#score");
-const highScoreEle = document.querySelector("#highScore");
-let highScore = 0;
-let gridArea = 20;
-let bloodWorm = [{ x: 10, y: 10 }];
-let prey = generatePrey();
-let direction = "right";
-let gameInterval;
-let gameSpeedDelay = 200;
-let gameStart = false;
+    // DEFINING GAME ELEMENTS
+    this.scoreEle = document.querySelector("#score");
+    this.highScoreEle = document.querySelector("#highScore");
+    this.highScore = 0;
+    this.gridCells = 20;
+    this.bloodWorm = [{ x: 10, y: 10 }];
+    this.prey = this.generatePrey();
+    this.direction = "right";
+    this.gameInterval = null;
+    this.gameSpeedDelay = 200;
+    this.gameStart = false;
+    this.bgMusic = new Audio("/sounds/8-bit-moonlight-sonata.mp3");
+    this.eatFX = new Audio("/sounds/eatingsound.mp3");
 
-// DRAWS GAME MAP, BLOODWORM, AND PREY
-function draw() {
-  board.innerHTML = "";
-  drawBloodWorm();
-  drawPrey();
-  scoreUpate();
-}
+    // LOOPS MUSIC AND CONTROLS VOLUME
+    this.bgMusic.loop = true;
+    this.bgMusic.volume = 0.3;
 
-// DRAW BLOODWORM
-function drawBloodWorm() {
-  bloodWorm.forEach((segPos) => {
-    const wormElement = createGameElem("div", "bloodWorm");
-    setPos(wormElement, segPos);
-    board.appendChild(wormElement);
-  });
-}
+    // SAVES HIGHSCORE TO LOCAL STORAGE UPON REFRESH OF BROWSER
+    this.highScore = parseInt(localStorage.getItem("highScore"), 10) || 0;
+    this.highScoreEle.innerHTML = this.highScore.toString().padStart(3, "0");
 
-// CREATES NEW BLOOWORM POSITION AND ALSO PREY ON GRID
-function createGameElem(tag, className) {
-  const element = document.createElement(tag);
-  element.className = className;
-  return element;
-}
-
-// SET POSITION OF BLOODWORM OR RANDOMIZED PREY LOCATION ON GRID
-function setPos(element, position) {
-  element.style.gridColumn = position.x;
-  element.style.gridRow = position.y;
-}
-
-// DRAW PREY FUNCTION
-function drawPrey() {
-  if (gameStart) {
-    const preyElem = createGameElem("div", "prey");
-    setPos(preyElem, prey);
-    board.appendChild(preyElem);
-  }
-}
-
-// GENERATES PREY AT RANDOM LOCATION THROUGHOUT GRID AREA
-function generatePrey() {
-  const x = Math.floor(Math.random() * gridArea) + 1;
-  const y = Math.floor(Math.random() * gridArea) + 1;
-  return { x, y };
-}
-
-// MOVING BLOODWORM ALL OVER GRID AREA
-function move() {
-  // SPREAD OPERATOR CREATES SHALLOW COPY OF BLOODWORM VARIABALE
-  const bloodWormHead = { ...bloodWorm[0] };
-
-  if (direction === "up") {
-    bloodWormHead.y--;
-  } else if (direction === "right") {
-    bloodWormHead.x++;
-  } else if (direction === "down") {
-    bloodWormHead.y++;
-  } else if (direction === "left") {
-    bloodWormHead.x--;
+    // ADDEVENTLISTENER FUNCTION ON SPACEBAR KEYDOWN
+    document.addEventListener("keydown", (e) => this.initSession(e));
   }
 
-  bloodWorm.unshift(bloodWormHead);
-
-  if (bloodWormHead.x === prey.x && bloodWormHead.y === prey.y) {
-    prey = generatePrey();
-    increaseSpeed();
-    // CLEARS PREVIOUS INTERVALS
-    clearInterval(gameInterval);
-    gameInterval = setInterval(() => {
-      move();
-      collisionDetect();
-      draw();
-    }, gameSpeedDelay);
-  } else {
-    bloodWorm.pop();
+  // DRAWS ELEMENTS TO THE GRID ("GAME screen")
+  draw() {
+    this.screen.innerHTML = "";
+    this.drawBloodWorm();
+    this.drawPrey();
+    this.updateScore();
   }
-}
 
-// STARTS GAME
-function startGame() {
-  gameStart = true;
-  instructions.style.display = "none";
-  BWlogo.style.display = "none";
-  board.style.backgroundImage = "url('BWBG.png')";
-  board.style.backgroundPosition = "center";
-  board.style.backgroundSize = "contain";
-  gameInterval = setInterval(() => {
-    move();
-    collisionDetect();
-    draw();
-  }, gameSpeedDelay);
-}
+  // DRAWS BLOODWORM
+  drawBloodWorm() {
+    this.bloodWorm.forEach((segPos) => {
+      const wormElement = this.createGameElem("div", "bloodWorm");
+      this.setPos(wormElement, segPos);
+      this.screen.appendChild(wormElement);
+    });
+  }
 
-// SPACEBAR KEY WILL INITIATE GAME USING ADDEVENTLISTENER
-function initSession(e) {
-  if ((!gameStart && e.code === "space") || (!gameStart && e.key === " ")) {
-    startGame();
-  } else {
-    if (e.key === "ArrowUp") {
-      direction = "up";
-    } else if (e.key === "ArrowRight") {
-      direction = "right";
-    } else if (e.key === "ArrowDown") {
-      direction = "down";
-    } else if (e.key === "ArrowLeft") {
-      direction = "left";
+  // Create Game Element (Bloodworm/Prey)
+  createGameElem(tag, className) {
+    const element = document.createElement(tag);
+    element.className = className;
+    return element;
+  }
+
+  // Set Position of Element on Grid
+  setPos(element, position) {
+    element.style.gridColumn = position.x;
+    element.style.gridRow = position.y;
+  }
+
+  // Draw Prey on Grid
+  drawPrey() {
+    if (this.gameStart) {
+      const preyElem = this.createGameElem("div", "prey");
+      this.setPos(preyElem, this.prey);
+      this.screen.appendChild(preyElem);
     }
   }
-}
 
-document.addEventListener("keydown", initSession);
-function increaseSpeed() {
-  // CONDITIONALS MANAGE THE SPEED OF BLOODWORM THE MORE IT EATS SO IT  DOESN'T GET OUT OF CONTROL AND BECOME HARD TO MOVE
-  if (gameSpeedDelay > 150) {
-    gameSpeedDelay -= 5;
-  } else if (gameSpeedDelay > 100) {
-    gameSpeedDelay -= 3;
-  } else if (gameSpeedDelay > 50) {
-    gameSpeedDelay -= 2;
-  } else if (gameSpeedDelay > 25) {
-    gameSpeedDelay -= 1;
-  }
-}
-
-// CHECKS TO SEE IF THERE IS A COLLISION AND RESETS GAME IF BLOODWORM COLLIDES WITH SURROUNDINGS
-function collisionDetect() {
-  const bloodWormHead = bloodWorm[0];
-
-  if (
-    bloodWormHead.x < 1 ||
-    bloodWormHead.x > gridArea ||
-    bloodWormHead.y < 1 ||
-    bloodWormHead.y > gridArea
-  ) {
-    resetGame();
-    board.style.backgroundImage = "none";
-    board.style.backgroundPosition = "none";
-    board.style.backgroundSize = "none";
+  // Generate Prey at Random Location
+  generatePrey() {
+    const x = Math.floor(Math.random() * this.gridCells) + 1;
+    const y = Math.floor(Math.random() * this.gridCells) + 1;
+    return { x, y };
   }
 
-  for (let s = 1; s < bloodWorm.length; s++) {
+  // Move Bloodworm across Grid
+  move() {
+    const bloodWormHead = { ...this.bloodWorm[0] };
+
+    if (this.direction === "up") bloodWormHead.y--;
+    else if (this.direction === "right") bloodWormHead.x++;
+    else if (this.direction === "down") bloodWormHead.y++;
+    else if (this.direction === "left") bloodWormHead.x--;
+
+    this.bloodWorm.unshift(bloodWormHead);
+
+    if (bloodWormHead.x === this.prey.x && bloodWormHead.y === this.prey.y) {
+      // WHEN BLOODWORM COORDS MEET PREYS, SOUNDS FX PLAY
+      this.eatFX.play();
+      this.eatFX.currentTime = 0; // Restart sound
+
+      this.prey = this.generatePrey();
+      this.increaseSpeed();
+      clearInterval(this.gameInterval);
+      this.gameInterval = setInterval(() => {
+        this.move();
+        this.collisionDetect();
+        this.draw();
+      }, this.gameSpeedDelay);
+    } else {
+      this.bloodWorm.pop();
+    }
+  }
+
+  // Start Game
+  startGame() {
+    this.gameStart = true;
+    this.instructions.style.display = "none";
+    this.BWlogo.style.display = "none";
+    this.screen.style.backgroundImage = "url('/images/BWBG.png')";
+    this.screen.style.backgroundPosition = "center";
+    this.screen.style.backgroundSize = "contain";
+
+    // STARTS MUSIC
+    this.bgMusic.play();
+
+    this.gameInterval = setInterval(() => {
+      this.move();
+      this.collisionDetect();
+      this.draw();
+    }, this.gameSpeedDelay);
+  }
+
+  // Initialize Game Session on Key Press
+  initSession(e) {
     if (
-      bloodWormHead.x === bloodWorm[s].x &&
-      bloodWormHead.y === bloodWorm[s].y
+      (!this.gameStart && e.code === "space") ||
+      (!this.gameStart && e.key === " ")
     ) {
-      resetGame();
-      board.style.backgroundImage = "none";
-      board.style.backgroundPosition = "none";
-      board.style.backgroundSize = "none";
+      this.startGame();
+    } else {
+      if (e.key === "ArrowUp") this.direction = "up";
+      else if (e.key === "ArrowRight") this.direction = "right";
+      else if (e.key === "ArrowDown") this.direction = "down";
+      else if (e.key === "ArrowLeft") this.direction = "left";
     }
   }
-}
 
-// RESETS GAME FUNCTION CALL
-function resetGame() {
-  hightScoreUpdate();
-  stopGame();
-  bloodWorm = [{ x: 10, y: 10 }];
-  prey = generatePrey();
-  direction = "right";
-  gameSpeedDelay = 200;
-  scoreUpate();
-}
-
-// UPDATES SCORE UPON GAME RESET
-function scoreUpate() {
-  const currentScore = bloodWorm.length - 1;
-  score.innerHTML = currentScore.toString().padStart(3, "0");
-}
-
-// STOPS GAME, SELF EXPLANATORY :D
-function stopGame() {
-  clearInterval(gameInterval);
-  gameStart = false;
-  instructions.style.display = "block";
-  BWlogo.style.display = "block";
-}
-
-// UPDATES HIGH SCORE
-function hightScoreUpdate() {
-  const currentScore = bloodWorm.length - 1;
-
-  if (currentScore > highScore) {
-    highScore = currentScore;
-    highScoreEle.innerHTML = highScore.toString().padStart(3, "0");
+  // Increase Game Speed
+  increaseSpeed() {
+    if (this.gameSpeedDelay > 150) this.gameSpeedDelay -= 5;
+    else if (this.gameSpeedDelay > 100) this.gameSpeedDelay -= 3;
+    else if (this.gameSpeedDelay > 50) this.gameSpeedDelay -= 2;
+    else if (this.gameSpeedDelay > 25) this.gameSpeedDelay -= 1;
   }
-  highScoreEle.style.display = "block";
+
+  // Detect Collisions with Grid Boundaries or Self
+  collisionDetect() {
+    const bloodWormHead = this.bloodWorm[0];
+
+    if (
+      bloodWormHead.x < 1 ||
+      bloodWormHead.x > this.gridCells ||
+      bloodWormHead.y < 1 ||
+      bloodWormHead.y > this.gridCells
+    ) {
+      this.resetGame();
+      this.resetScreenStyle();
+    }
+
+    for (let s = 1; s < this.bloodWorm.length; s++) {
+      if (
+        bloodWormHead.x === this.bloodWorm[s].x &&
+        bloodWormHead.y === this.bloodWorm[s].y
+      ) {
+        this.resetGame();
+        this.resetScreenStyle();
+      }
+    }
+  }
+
+  // RESETS screen
+  resetScreenStyle() {
+    this.screen.style.backgroundImage = "none";
+    this.screen.style.backgroundPosition = "none";
+    this.screen.style.backgroundSize = "none";
+  }
+
+  // RESETS BLOODWORM GAME
+  resetGame() {
+    this.updateHighScore();
+    this.stopGame();
+    this.bloodWorm = [{ x: 10, y: 10 }];
+    this.prey = this.generatePrey();
+    this.direction = "right";
+    this.gameSpeedDelay = 200;
+    this.updateScore();
+  }
+
+  // UPDATES CURRENT SCORE BASED ON BLOODWORM LENGTH
+  updateScore() {
+    const currentScore = this.bloodWorm.length - 1;
+    this.scoreEle.innerHTML = currentScore.toString().padStart(3, "0");
+  }
+
+  // INACTIVE GAME
+  stopGame() {
+    clearInterval(this.gameInterval);
+    this.gameStart = false;
+    this.instructions.style.display = "block";
+    this.BWlogo.style.display = "block";
+
+    // STOPS MUSIC WHEN GAME RESETS
+    this.bgMusic.pause();
+    this.bgMusic.currentTime = 0;
+  }
+
+  // UPDATE HIGHSCORE AND SETS TO LOCAL STORAGE API
+  updateHighScore() {
+    const currentScore = this.bloodWorm.length - 1;
+
+    if (currentScore > this.highScore) {
+      this.highScore = currentScore;
+      localStorage.setItem("highScore", this.highScore);
+      this.highScoreEle.innerHTML = this.highScore.toString().padStart(3, "0");
+    }
+    this.highScoreEle.style.display = "block";
+  }
 }
+
+// INITIATES GAME
+const play = new BloodWormGame();
+
+// ENABLE LIGHT TOGGLE
+const lights = function () {
+  const lightSwitch = document.querySelector(".lightSwitch");
+  const lightNip = document.querySelector(".lightNip");
+  let lightMode = localStorage.getItem("light-theme");
+  const body = document.querySelector("body");
+
+  const enableLightToggle = function () {
+    lightNip.classList.add("lightNip--turnOnOff");
+    body.classList.add("light-theme");
+    localStorage.setItem("light-theme", "enabled");
+  };
+
+  const disableLightToggle = function () {
+    lightNip.classList.remove("lightNip--turnOnOff");
+    body.classList.remove("light-theme");
+    localStorage.setItem("light-theme", "disabled");
+  };
+
+  if (lightMode === "enabled") {
+    enableLightToggle();
+  }
+
+  const checkLightMode = function (e) {
+    lightMode = localStorage.getItem("light-theme"); // UPDATE LIGHT-MODE WHEN CLICKED
+    if (lightMode === "disabled") {
+      enableLightToggle();
+    } else {
+      disableLightToggle();
+    }
+  };
+
+  lightSwitch.addEventListener("click", checkLightMode);
+};
+lights();
